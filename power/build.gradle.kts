@@ -1,9 +1,11 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.library)
 }
 
 android {
-    namespace = "com.arm.aichat"
+    namespace = "com.dotsdev.power"
     compileSdk = 36
 
     ndkVersion = "29.0.13113456"
@@ -17,8 +19,12 @@ android {
         ndk {
             abiFilters += listOf("arm64-v8a", "x86_64")
         }
+        val properties = Properties()
+        properties.load(project.rootProject.file("local.properties").inputStream())
+        val llamaPath = properties.getProperty("llama.cpp.dir") ?: "${rootDir}/../llama.cpp"
         externalNativeBuild {
             cmake {
+                arguments += "-DLLAMA_SRC=$llamaPath"
                 arguments += "-DCMAKE_BUILD_TYPE=Release"
                 arguments += "-DCMAKE_MESSAGE_LOG_LEVEL=DEBUG"
                 arguments += "-DCMAKE_VERBOSE_MAKEFILE=ON"

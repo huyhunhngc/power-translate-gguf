@@ -6,7 +6,7 @@ import com.dotsdev.power.internal.InferenceEngineImpl
 /**
  * Main entry point for Arm's AI Chat library.
  */
-object AiChat {
+object Power {
     /**
      * Get the inference engine single instance.
      */

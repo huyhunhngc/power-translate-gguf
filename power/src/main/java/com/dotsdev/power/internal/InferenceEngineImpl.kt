@@ -41,7 +41,7 @@ import java.io.IOException
  *
  * State transitions are managed automatically and validated at each operation.
  *
- * @see ai_chat.cpp for the native implementation details
+ * @see power.cpp for the native implementation details
  */
 internal class InferenceEngineImpl private constructor(
     private val nativeLibDir: String
@@ -77,7 +77,7 @@ internal class InferenceEngineImpl private constructor(
 
     /**
      * JNI methods
-     * @see ai_chat.cpp
+     * @see power.cpp
      */
     @FastNative
     private external fun init(nativeLibDir: String)
@@ -188,9 +188,9 @@ internal class InferenceEngineImpl private constructor(
      *
      * TODO-han.yin: return error code if system prompt not correct processed?
      */
-    override suspend fun setSystemPrompt(prompt: String) =
+    override suspend fun setSystemPrompt(systemPrompt: String) =
         withContext(llamaDispatcher) {
-            require(prompt.isNotBlank()) { "Cannot process empty system prompt!" }
+            require(systemPrompt.isNotBlank()) { "Cannot process empty system prompt!" }
             check(_readyForSystemPrompt) { "System prompt must be set ** RIGHT AFTER ** model loaded!" }
             check(_state.value is InferenceEngine.State.ModelReady) {
                 "Cannot process system prompt in ${_state.value.javaClass.simpleName}!"
@@ -199,7 +199,7 @@ internal class InferenceEngineImpl private constructor(
             Log.i(TAG, "Sending system prompt...")
             _readyForSystemPrompt = false
             _state.value = InferenceEngine.State.ProcessingSystemPrompt
-            processSystemPrompt(prompt).let { result ->
+            processSystemPrompt(systemPrompt).let { result ->
                 if (result != 0) {
                     RuntimeException("Failed to process system prompt: $result").also {
                         _state.value = InferenceEngine.State.Error(it)
